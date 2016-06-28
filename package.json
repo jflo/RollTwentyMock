@@ -1,8 +1,8 @@
 {
-  "name": "roll20mock",
+  "name": "RollTwentyMock",
   "version": "1.0.0",
   "description": "Mock the Roll20 API for test purposes",
-  "main": "Roll20Mock.js",
+  "main": "RollTwentyMock.js",
   "directories": {
     "test": "tests"
   },
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/unexre/roll20mock.git"
+    "url": "git+https://github.com/unexre/RollTwentyMock.git"
   },
   "author": "Unexre <unexre@users.noreply.github.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unexre/roll20mock/issues"
+    "url": "https://github.com/unexre/RollTwentyMock/issues"
   },
-  "homepage": "https://github.com/unexre/roll20mock#readme",
+  "homepage": "https://github.com/unexre/RollTwentyMock#readme",
   "dependencies": {
     "standard": "^7.1.2"
   }
