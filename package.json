@@ -14,7 +14,7 @@
     "url": "git+https://github.com/unexre/RollTwentyMock.git"
   },
   "author": "Unexre <unexre@users.noreply.github.com>",
-  "license": "MIT",
+  "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/unexre/RollTwentyMock/issues"
   },
