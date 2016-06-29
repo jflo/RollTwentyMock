@@ -1,11 +1,9 @@
 var r20chat = r20chat || function () {
         var r20event = require('./r20event');
 
-        function sendChat(speakingAs, msgBody, cb, options) {
-            // this only works in es6+
-            // console.log(`Chat sent: <${speakingAs}> ${msgBody}`);
-
-            r20event.triggerEvents('chat:message', msgBody);
+        function sendChat(speakingAs, msg, cb, options) {
+            console.log('CHAT: <' + speakingAs + '> ' + msg);
+            r20event.triggerEvents('chat:message', msg);
         }
 
         return {

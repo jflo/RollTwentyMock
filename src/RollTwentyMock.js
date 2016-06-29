@@ -4,33 +4,44 @@ var RollTwentyMock = RollTwentyMock || function () {
         const r20event = require('./r20event');
         const r20chat = require('./r20chat');
 
-        // const campaign =
+        const campaign = r20object.createObj();
 
         // var campaign = new GameObject();
-        var state = {};
-        var eventMap = {};
-        
-        // function initCampaign() {
-        //     campaign.turnorder = '';
-        //     campaign.initiativepage = false;
-        //     campaign.playerpageid = false;
-        //     campaign.playerspecificpages = false;
-        // }
+        const state = {};
+
+        function initCampaign() {
+            campaign._type = "campaign";
+            campaign.turnorder = '';
+            campaign.initiativepage = false;
+            campaign.playerpageid = false;
+            campaign.playerspecificpages = false;
+        }
+
         //
-        // function Campaign() {
-        //     return campaign;
-        // }
+        function Campaign() {
+            return campaign;
+        }
         //
-        // initCampaign();
+        initCampaign();
 
         return {
-            // r20chat
+            state: state,
+            Campaign: Campaign,
+
             sendChat: r20chat.sendChat,
-            // r20event
+
             triggerEvents: r20event.triggerEvents,
             on: r20event.on,
-            // r20object
-            // r20utility
+
+            createObj: r20object.createObj,
+            getObj: r20object.getObj,
+            findObjs: r20object.findObjs,
+            filterObjs: r20object.filterObjs,
+            getAllObjs: r20object.getAllObjs,
+            getAttrByName: r20object.getAttrByName,
+            toFront: r20object.toFront,
+            toBack: r20object.toBack,
+
             log: r20utility.log,
             randomInteger: r20utility.randomInteger,
             playerIsGM: r20utility.playerIsGM,
@@ -43,7 +54,7 @@ var RollTwentyMock = RollTwentyMock || function () {
         };
     }();
 
-// This is dirty. I'm sorry.
+// This is dirty. I'm sorry. Not really.
 Object.keys(RollTwentyMock).forEach(function(key) {
     GLOBAL[key] = RollTwentyMock[key];
 });

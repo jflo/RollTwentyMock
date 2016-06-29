@@ -1,6 +1,6 @@
 var r20utility = r20utility || function () {
-        function log(message) {
-            // DONE - no return
+        function log(msg) {
+            console.log('LOG: ' + msg);
         }
 
         function randomInteger(max) {
@@ -14,7 +14,7 @@ var r20utility = r20utility || function () {
             return true;
         }
 
-        function spawnFx(x, y, type, pageid) {
+        function spawnFx(x, y, type, pageID) {
             // DONE - no return
         }
 
