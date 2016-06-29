@@ -24,8 +24,12 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
+    "gulp-jasmine": "^2.4.0",
     "gulp-jshint": "^2.0.1",
-    "jshint": "^2.9.2"
+    "jasmine": "^2.4.1",
+    "jasmine-reporters": "^2.2.0",
+    "jshint": "^2.9.2",
+    "pump": "^1.0.1"
   },
   "private": true
 }
