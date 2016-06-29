@@ -1,4 +1,4 @@
-# roll20mock
+# RollTwentyMock
 
 For testing code that relies on Roll20 API.
 
