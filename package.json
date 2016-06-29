@@ -1,8 +1,8 @@
 {
   "name": "RollTwentyMock",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Mock the Roll20 API for test purposes",
-  "main": "RollTwentyMock.js",
+  "main": "src/RollTwentyMock.js",
   "directories": {
     "test": "tests"
   },
@@ -26,5 +26,6 @@
     "gulp": "^3.9.1",
     "gulp-jshint": "^2.0.1",
     "jshint": "^2.9.2"
-  }
+  },
+  "private": true
 }
