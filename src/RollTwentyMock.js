@@ -454,7 +454,7 @@ const RollTwentyMock = RollTwentyMock || function() {
 
         function sendChat(speakingAs, msg, cb, options) {
             console.log('CHAT: <' + speakingAs + '> ' + msg);
-            r20event.triggerEvents('chat:message', msg);
+            _triggerEvents('chat:message', msg);
         }
 
         function log(msg) {
