@@ -1,6 +1,3 @@
-var r20 = require('../src/RollTwentyMock');
-
-
 on('ready', function () {
     var gameobjects = getAllObjs();
 
@@ -11,4 +8,3 @@ on('ready', function () {
         log(`${t}:${i}:${n}`);
     });
 });
- 

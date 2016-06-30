@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "standard && gulp test"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",

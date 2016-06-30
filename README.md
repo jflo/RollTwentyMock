@@ -16,3 +16,8 @@ You can't. Nor will this ever be added.
 
 This does not implement any of the Roll20 features that allow gameplay. It can only be used by people who write
 scripts for the Roll20 API and want to test their scripts before they upload them to Roll20.
+
+**How do I load this into Roll20?**
+
+Please don't. It will not do anything helpful and it will cause errors in your game. Errors cause your game to lose
+access to the API until they are fixed.
