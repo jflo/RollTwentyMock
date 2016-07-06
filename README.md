@@ -40,7 +40,8 @@ not be what your tests expect. It's easy enough to comment out the last three li
 
 **What file(s) do I need to download from GitHub?**
 
-The only file you need is `src/RollTwentyMock.js` which you can probably get using [this link]().
+The only file you need is `src/RollTwentyMock.js` which you can probably get using
+[this link](https://raw.githubusercontent.com/unexre/RollTwentyMock/master/src/RollTwentyMock.js).
 
 Yeah, sorry. There are a ton of files in the repository that are either about the project or used for testing the
 project.  You can safely ignore all of them if you're not planning to contribute to the project.
