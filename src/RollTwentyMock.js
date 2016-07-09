@@ -410,19 +410,40 @@ const RollTwentyMock = RollTwentyMock || function() {
             return o;
         }
 
-        function getObj() {
-
+        function getObj(type, id) {
+            for (var i = 0, len = gameObjectDB.length; i < len; i++) {
+                if ((gameObjectDB[i]._type == type) && (gameObjectDB[i]._id === id)) {
+                    return gameObjectDB[i];
+                }
+            }
         }
-        function findObjs() {
+        function findObjs(attrs, options) {
+            options = options || {};
 
+            // todo: handle options.caseInsensitive = true
+
+            var keys = Object.keys(attrs);
+            var l = keys.length;
+
+            return gameObjectDB.filter(function(o) {
+                for (var i = 0; i < l; i++) {
+                    var k = keys[i];
+                    if (!(k in o)) return false;
+                    if (o[k] !== needle[k]) return false;
+                }
+                return true;
+            });
         }
-        function filterObjs() {
-
+        function filterObjs(callback) {
+            return gameObjectDB.filter(callback);
         }
         function getAllObjs() {
-
+            return gameObjectDB;
         }
-        function getAttrByName() {
+        function getAttrByName(character_id, attribute_name, value_type) {
+            value_type = value_type || 'current';
+            
+
 
         }
         function toFront() {
@@ -458,6 +479,7 @@ const RollTwentyMock = RollTwentyMock || function() {
         }
 
         function sendChat(speakingAs, msg, cb, options) {
+            // todo: create message object
             console.log('CHAT: <' + speakingAs + '> ' + msg);
             _triggerEvents('chat:message', msg);
         }
