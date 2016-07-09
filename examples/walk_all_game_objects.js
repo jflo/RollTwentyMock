@@ -1,3 +1,5 @@
+require('../src/RollTwentyMock');
+
 on('ready', function () {
     var gameobjects = getAllObjs();
 

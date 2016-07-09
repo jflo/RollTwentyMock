@@ -6,12 +6,6 @@
 require('../src/RollTwentyMock');
 
 describe('sendChat', function() {
-    it('should print to console log', function() {
-        // clear all chat events
-        console.log = jasmine.createSpy("log");
-        sendChat('player name', 'message');
-        expect(console.log).toHaveBeenCalled();
-    });
     it('should trigger chat events', function() {
         // clear all chat events
         // create a chat event

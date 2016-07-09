@@ -25,13 +25,13 @@ describe('randomInteger', function() {
 describe('log', function() {
     it('should never return a value', function() {
         var r = log('test');
-        expect(r).not.toBeDefined()
+        expect(r).not.toBeDefined();
     });
     it('should call console.log with the parameter', function() {
-        var msg = "testing123";
-        console.log = jasmine.createSpy("log");
+        var msg = 'testing123';
+        console.log = jasmine.createSpy('log');
         log(msg);
-        expect(console.log).toHaveBeenCalledWith("LOG: " + msg);
+        expect(console.log).toHaveBeenCalledWith('LOG: ' + msg);
     });
 });
 
@@ -39,7 +39,7 @@ describe('log', function() {
 describe('spawnFX', function() {
     it('should never return a value', function() {
         var r = spawnFx(500, 500, 'blood', Campaign().get('playerpageid'));
-        expect(r).not.toBeDefined()
+        expect(r).not.toBeDefined();
     });
     it('should not modify game state', function() {
         // todo: how to test for this?
@@ -50,5 +50,5 @@ describe('playerIsGM', function() {
     it('should always return boolean', function() {
         var r = playerIsGM('12345');
         expect(typeof r).toBe('boolean');
-    })
+    });
 });

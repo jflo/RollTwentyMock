@@ -36,15 +36,15 @@ const RollTwentyMock = RollTwentyMock || function() {
         ];
 
         // not sure these are needed
-        const statusMarkers = [
-            'red', 'blue', 'green', 'brown', 'purple', 'pink', 'yellow', 'dead', 'skull', 'sleepy', 'half-heart',
-            'half-haze', 'interdiction', 'snail', 'lightning-helix', 'spanner', 'chained-heart', 'chemical-bolt',
-            'death-zone', 'drink-me', 'edge-crack', 'ninja-mask', 'stopwatch', 'fishing-net', 'overdrive', 'strong',
-            'fist', 'padlock', 'three-leaves', 'fluffy-wing', 'pummeled', 'tread', 'arrowed', 'aura', 'back-pain',
-            'black-flag', 'bleeding-eye', 'bolt-shield', 'broken-heart', 'cobweb', 'broken-shield', 'flying-flag',
-            'radioactive', 'trophy', 'broken-skull', 'frozen-orb', 'rolling-bomb', 'white-tower', 'grab', 'screaming',
-            'grenade', 'sentry-gun', 'all-for-one', 'angel-outfit', 'archery-target'
-        ];
+        // const statusMarkers = [
+        //     'red', 'blue', 'green', 'brown', 'purple', 'pink', 'yellow', 'dead', 'skull', 'sleepy', 'half-heart',
+        //     'half-haze', 'interdiction', 'snail', 'lightning-helix', 'spanner', 'chained-heart', 'chemical-bolt',
+        //     'death-zone', 'drink-me', 'edge-crack', 'ninja-mask', 'stopwatch', 'fishing-net', 'overdrive', 'strong',
+        //     'fist', 'padlock', 'three-leaves', 'fluffy-wing', 'pummeled', 'tread', 'arrowed', 'aura', 'back-pain',
+        //     'black-flag', 'bleeding-eye', 'bolt-shield', 'broken-heart', 'cobweb', 'broken-shield', 'flying-flag',
+        //     'radioactive', 'trophy', 'broken-skull', 'frozen-orb', 'rolling-bomb', 'white-tower', 'grab',
+        //     'screaming', 'grenade', 'sentry-gun', 'all-for-one', 'angel-outfit', 'archery-target'
+        // ];
 
         // giant dictionary of all the default fields/values for
         // objects of each type
@@ -286,6 +286,19 @@ const RollTwentyMock = RollTwentyMock || function() {
         var _initialized = false;
         var campaign;
 
+        // PRIVATE FUNCS
+        // todo: different kinds of uuids to match the ones assigned to different object types
+        // Can't figure out the format for the non-uuid4 ones. they're like the output of unix crypt() with '-K' salt?
+        // but they're not entirely random either -- first 4 (or more) bytes shared between objs of same type
+        function _uuid() {
+            // from http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+            // by broofa
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+        }
+
         // CLASS APIEVENT
         function APIEvent(trigger, cb) {
             this.trigger = trigger;
@@ -310,10 +323,9 @@ const RollTwentyMock = RollTwentyMock || function() {
 
         // CLASS GAMEOBJECT
         function GameObject(otype) {
-            if (Object.keys(defaultValues).indexOf(otype) === -1) {
+            if (Object.keys(defaultValues).indexOf(otype) === -1)
                 throw 'Tried to create unknown GameObject type';
-            }
-            // set uuid first so campaign's can be overwritten by defaults
+            // set uuid first so campaign's can be overwritten by 'root' in defaults
             this._id = _uuid();
             this.id = this._id;
             var gameobj = this;
@@ -361,14 +373,19 @@ const RollTwentyMock = RollTwentyMock || function() {
         };
 
         GameObject.prototype.remove = function remove() {
-            // this is almost definitely not the way to do this
+            if (!(this._type in createableObjectTypes))
+                throw 'ERROR: Tried to remove an invalid object type. See the API Documentation for valid types.';
             var i = gameObjectDB.indexOf(this);
             if (i > -1) {
                 gameObjectDB.splice(i, 1);
             }
         };
 
+
         function _triggerEvents(trigger, details) {
+            trigger = trigger || 'NONEXISTENT_EVENT';
+            details = details || {};
+
             // From the API docs:
             //     Events are fired synchronously (meaning each function won't start until the
             //     previous one has finished) in order from first-bound to last-bound, and also
@@ -385,117 +402,9 @@ const RollTwentyMock = RollTwentyMock || function() {
                 });
                 trigger = trigger.replace(/:[\w]+$/, '');
             }
-        }
-
-        function on(trigger, cb) {
-            var e = new APIEvent(trigger, cb);
-            eventList.push(e);
-        }
-
-        // todo: move this and other private funcs to top
-        function _uuid() {
-            // from http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
-            // by broofa
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-                return v.toString(16);
+            eventList.forEach(function(entry) {
+                entry.conditionalRun(trigger, details);
             });
-        }
-
-        function createObj (otype) {
-            if (createableObjectTypes.indexOf(otype) === -1) {
-                throw 'ERROR: Tried to create an invalid object type. See the API Documentation for valid types.';
-            }
-            var o = new GameObject(otype);
-            if (typeof arguments[1] === 'object') {
-                o.set(arguments[1]);
-            }
-            return o;
-        }
-
-        function getObj(type, id) {
-            for (var i = 0, len = gameObjectDB.length; i < len; i++) {
-                if ((gameObjectDB[i]._type == type) && (gameObjectDB[i]._id === id)) {
-                    return gameObjectDB[i];
-                }
-            }
-        }
-
-        function findObjs(attrs, options) {
-            options = options || {};
-
-            // todo: handle options.caseInsensitive = true
-
-            var keys = Object.keys(attrs);
-            var l = keys.length;
-
-            return gameObjectDB.filter(function(o) {
-                for (var i = 0; i < l; i++) {
-                    var k = keys[i];
-                    if (!(k in o)) return false;
-                    if (o[k] !== needle[k]) return false;
-                }
-                return true;
-            });
-        }
-
-        function filterObjs(callback) {
-            return gameObjectDB.filter(callback);
-        }
-
-        function getAllObjs() {
-            return gameObjectDB;
-        }
-
-        function getAttrByName(character_id, attribute_name, value_type) {
-            value_type = value_type || 'current';
-
-
-
-        }
-
-        function toFront(obj) {
-            if (!('_id' in obj)) throw 'Error: toFront() must be given an object either from an event or getObj() or similar.';
-            if (!('_pageid' in obj)) throw 'Error: Could not find page for object.';
-
-            var pg = getObj('page', obj._pageid);
-
-            if (!('_id' in pg)) throw 'Error: Could not find page for object.';
-
-            var zlist = pg._zorder.split(',');
-            var pos = zlist.indexOf(obj._id);
-            if (pos > -1) {
-                zlist.splice(pos, 1);
-            } else {
-                // todo: what's the real error? Is this even possible?
-                throw 'Error: obj not found in zorder list for that page';
-            }
-            zlist.unshift(obj._id);
-            pg._zorder = zlist.join();
-        }
-
-        function toBack(obj) {
-            if (!('_id' in obj)) throw 'Error: toFront() must be given an object either from an event or getObj() or similar.';
-            if (!('_pageid' in obj)) throw 'Error: Could not find page for object.';
-
-            var pg = getObj('page', obj._pageid);
-
-            if (!('_id' in pg)) throw 'Error: Could not find page for object.';
-
-            var zlist = pg._zorder.split(',');
-            var pos = zlist.indexOf(obj._id);
-            if (pos > -1) {
-                zlist.splice(pos, 1);
-            } else {
-                // todo: what's the real error? Is this even possible?
-                throw 'Error: obj not found in zorder list for that page';
-            }
-            zlist.push(obj._id);
-            pg._zorder = zlist.join();
-        }
-
-        function Campaign() {
-            return campaign;
         }
 
         function _init() {
@@ -518,43 +427,273 @@ const RollTwentyMock = RollTwentyMock || function() {
             });
 
             _initialized = true;
+
+            setTimeout(_triggerEvents, 100, 'ready');
         }
 
-        function sendChat(speakingAs, msg, cb, options) {
-            // todo: create message object
-            console.log('CHAT: <' + speakingAs + '> ' + msg);
-            _triggerEvents('chat:message', msg);
+        // PUBLIC FUNCS
+
+        function on(trigger, cb) {
+            // DONE?
+            cb = cb || function() {};
+
+            var e = new APIEvent(trigger, cb);
+            eventList.push(e);
+        }
+
+        function createObj (type, attributes) {
+            attributes = attributes || {};
+            if (createableObjectTypes.indexOf(type) === -1) {
+                throw 'ERROR: Tried to create an invalid object type. See the API Documentation for valid types.';
+            }
+            var o = new GameObject(type);
+            if (Object.keys(attributes).length > 0) {
+                o.set(arguments);
+            }
+            return o;
+        }
+
+        function getObj(type, id) {
+            for (var i = 0, len = gameObjectDB.length; i < len; i++) {
+                if ((gameObjectDB[i]._type === type) && (gameObjectDB[i]._id === id)) {
+                    return gameObjectDB[i];
+                }
+            }
+        }
+
+        function findObjs(attrs, options) {
+            options = options || {};
+
+            // todo: handle options.caseInsensitive = true
+
+            var keys = Object.keys(attrs);
+            var l = keys.length;
+
+            return gameObjectDB.filter(function(o) {
+                for (var i = 0; i < l; i++) {
+                    var k = keys[i];
+                    if (!(k in o)) return false;
+                    if (o[k] !== attrs[k]) return false;
+                }
+                return true;
+            });
+        }
+
+        function filterObjs(callback) {
+            // DONE?
+            callback = callback || function() {return true;};
+
+            return gameObjectDB.filter(callback);
+        }
+
+        function getAllObjs() {
+            // DONE?
+            return gameObjectDB;
+        }
+
+        function getAttrByName(character_id, attribute_name, value_type) {
+            value_type = value_type || 'current';
+
+
+
+        }
+
+        function toFront(obj) {
+            // DONE?
+            if (!('_id' in obj))
+                throw 'Error: toFront() must be given an object either from an event or getObj() or similar.';
+            if (!('_pageid' in obj))
+                throw 'Error: Could not find page for object.';
+
+            var pg = getObj('page', obj._pageid);
+
+            if (!('_id' in pg)) throw 'Error: Could not find page for object.';
+
+            var zlist = pg._zorder.split(',');
+            var pos = zlist.indexOf(obj._id);
+            if (pos > -1) {
+                zlist.splice(pos, 1);
+            } else {
+                // todo: what's the real error? Is this even possible?
+                throw 'Error: obj not found in zorder list for that page';
+            }
+            zlist.unshift(obj._id);
+            pg._zorder = zlist.join();
+        }
+
+        function toBack(obj) {
+            // DONE?
+            if (!('_id' in obj))
+                throw 'Error: toBack() must be given an object either from an event or getObj() or similar.';
+            if (!('_pageid' in obj))
+                throw 'Error: Could not find page for object.';
+
+            var pg = getObj('page', obj._pageid);
+
+            if (!('_id' in pg)) throw 'Error: Could not find page for object.';
+
+            var zlist = pg._zorder.split(',');
+            var pos = zlist.indexOf(obj._id);
+            if (pos > -1) {
+                zlist.splice(pos, 1);
+            } else {
+                // todo: what's the real error? Is this even possible?
+                throw 'Error: obj not found in zorder list for that page';
+            }
+            zlist.push(obj._id);
+            pg._zorder = zlist.join();
+        }
+
+        function Campaign() {
+            // DONE
+            return campaign;
+        }
+
+        function sendChat(speakingAs, input, cb, options) {
+            cb = cb || function() {};
+            options = options || {};
+
+            var Message = {
+                who: '',
+                playerid: '',
+                type: 'general',
+                content: input
+            };
+            var sp;
+
+            if (speakingAs.indexOf('|') !== -1) {
+                var objDetails = speakingAs.split('|');
+                // es6 really didn't like my deference assignment here
+                var objType = objDetails[0];
+                var objID = objDetails[1];
+                switch (objType) {
+                    case 'player':
+                        sp = getObj('player', objID);
+                        if (sp !== undefined)
+                            Message.playerid = sp._id;
+                        else
+                            throw 'ERROR: Sendchat with illegal speakingAs player id';
+                        break;
+                    case 'character':
+                        sp = getObj('character', objID);
+                        if (sp !== undefined)
+                            Message.playerid = sp._id;
+                        else
+                            throw 'ERROR: Sendchat with illegal speakingAs character id';
+                        break;
+                    default:
+                        throw 'ERROR: Sendchat with illegal speakingAs type';
+                }
+            } else {
+                Message.who = speakingAs;
+                sp = findObjs({
+                    _type: 'player',
+                    _displayname: speakingAs
+                });
+                if (sp.length === 1)
+                    Message.playerid = sp[0]._id;
+            }
+
+            if (input.startsWith('!')) {
+                Message.type = 'api';
+            }
+            if (input.startsWith('/')) {
+                // big assumption here
+                var msgtype = input.split(' ')[0];
+                switch(msgtype) {
+                    case '/roll':
+                        Message.type = 'rollresult';
+                        break;
+                    case '/gmroll':
+                        Message.type = 'gmrollresult';
+                        break;
+                    case '/em':
+                        Message.type = 'emote';
+                        break;
+                    case '/w':
+                        Message.type = 'whisper';
+                        break;
+                    case '/desc':
+                        Message.type = 'desc';
+                        break;
+                    case '/as':
+                        Message.type = 'general';
+                        break;
+                    case '/emas':
+                        Message.type = 'emote';
+                        break;
+                }
+            }
+
+            if (Message.type === 'whisper') {
+                // todo: parse the recipient
+                Message.target = '';
+                Message.target_name = '';
+            }
+            if (Message.type.indexOf('rollresult') !== -1) {
+                // todo: parse the roll
+                Message.origRoll = Message.content;
+                Message.inlinerolls = [];
+                Message.rolltemplate = '';
+            }
+            if (Message.type === 'emote') {
+                // todo: ?nothing special?
+            }
+            if (Message.type === 'api') {
+                Message.selected = [];
+            }
+
+            var logmsg = 'CHAT: <' + Message.who + '> ' + Message.content;
+            setTimeout(console.log, 0, logmsg);
+            setTimeout(_triggerEvents, 0, 'chat:message', Message);
+            setTimeout(cb, 0, Message);
         }
 
         function log(msg) {
+            // DONE?
             console.log('LOG: ' + msg);
         }
 
         function randomInteger(max) {
+            // DONE?
             // This is inferior to the real API's implementation but
             // no one should be using this for repeated calls.
             return Math.floor(Math.random() * max) + 1;
         }
 
         function playerIsGM(playerID) {
-            // todo: Good enough?
+            // DONE?
+            playerID = playerID || '';
             return true;
         }
 
         function spawnFx(x, y, type, pageID) {
             // DONE - no return
+            x = x || 0;
+            y = y || 0;
+            type = type || 'beam-acid';
+            pageID = pageID || Campaign().get('playerpageid');
         }
 
         function spawnFxBetweenPoints(point1, point2, type, pageID) {
             // DONE - no return
+            point1 = point1 || {x: 0, y: 0};
+            point2 = point2 || {x: 0, y: 0};
+            type = type || 'beam-acid';
+            pageID = pageID || Campaign().get('playerpageid');
         }
 
         function spawnFxWithDefinition(x, y, definitionJSON, pageID) {
             // DONE - no return
+            x = x || 0;
+            y = y || 0;
+            definitionJSON = definitionJSON || '{}';
+            pageID = pageID || Campaign().get('playerpageid');
         }
 
         function playJukeboxPlaylist(playListID) {
             // DONE - no return
+            playListID = playListID || '';
         }
 
         function stopJukeboxPlaylist() {
@@ -563,6 +702,11 @@ const RollTwentyMock = RollTwentyMock || function() {
 
         function sendPing(left, top, pageID, playerID, moveAll) {
             // DONE - no return
+            left = left || 0;
+            top = top || 0;
+            pageID = pageID || Campaign().get('playerpageid');
+            playerID = playerID || null;
+            moveAll = moveAll || false;
         }
 
         _init();
@@ -596,7 +740,11 @@ const RollTwentyMock = RollTwentyMock || function() {
         };
     }();
 
+
+exports.RollTwentyMock = RollTwentyMock;
+
 // This is dirty. I'm sorry. (Not really.)
 Object.keys(RollTwentyMock).forEach(function(key) {
+    "use strict";
     global[key] = RollTwentyMock[key];
 });
