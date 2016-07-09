@@ -1,0 +1,35 @@
+{
+  "name": "RollTwentyMock",
+  "version": "0.0.1",
+  "description": "Mock the Roll20 API for test purposes",
+  "main": "src/RollTwentyMock.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unexre/RollTwentyMock.git"
+  },
+  "author": "Unexre <unexre@users.noreply.github.com>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/unexre/RollTwentyMock/issues"
+  },
+  "homepage": "https://github.com/unexre/RollTwentyMock#readme",
+  "dependencies": {
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-jasmine": "^2.4.0",
+    "gulp-jshint": "^2.0.1",
+    "jasmine": "^2.4.1",
+    "jasmine-reporters": "^2.2.0",
+    "jshint": "^2.9.2",
+    "pump": "^1.0.1"
+  },
+  "private": true
+}
