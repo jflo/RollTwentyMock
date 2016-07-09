@@ -6,13 +6,46 @@
    */
 
   // Define globals exposed by modern browsers.
-  "browser": true,
+  "browser": false,
 
   // Define globals exposed by jQuery.
-  "jquery": true,
+  "jquery": false,
 
   // Define globals exposed by Node.js.
   "node": true,
+
+  // Globals for test suite
+  "jasmine": true,
+
+  // Globals for API spec
+  "predef": [
+    "Campaign",
+
+    "getAttrByName",
+    "createObj",
+    "getObj",
+    "findObjs",
+    "filterObjs",
+    "getAllObjs",
+
+    "on",
+
+    "sendChat",
+
+    "log",
+    "toFront",
+    "toBack",
+    "randomInteger",
+    "playerIsGM",
+    "spawnFx",
+    "spawnFxBetweenPoints",
+    "spawnFxWithDefinition",
+    "playJukeboxPlaylist",
+    "stopJukeboxPlaylist",
+    "sendPing",
+
+    "state"
+  ],
 
   // Allow ES6.
   "esversion": 6,
@@ -24,7 +57,7 @@
 
   // Force all variable names to use either camelCase style or UPPER_CASE
   // with underscores.
-  "camelcase": true,
+  "camelcase": false,
 
   // Prohibit use of == and != in favor of === and !==.
   "eqeqeq": true,
@@ -35,8 +68,8 @@
   // Prohibit use of a variable before it is defined.
   "latedef": true,
 
-  // Enforce line length to 100 characters
-  "maxlen": 100,
+  // Enforce line length to 120 characters (github width)
+  "maxlen": 120,
 
   // Require capitalized names for constructor functions.
   "newcap": true,
@@ -44,7 +77,7 @@
   // Enforce use of single quotation marks for strings.
   "quotmark": "single",
 
-  // Enforce placing 'use strict' at the top function scope
+  // Enforce placing "use strict" at the top function scope
   "strict": true,
 
   // Prohibit use of explicitly undeclared variables.

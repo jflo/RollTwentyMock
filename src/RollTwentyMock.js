@@ -1,5 +1,6 @@
 /**
- * Approximation of Roll20's script API for purposes of testing
+ * A library that approximates the API made available to scripts for
+ * the sole purpose of testing those scripts offline.
  * https://github.com/unexre/RollTwentyMock
  * @version 0.0.1
  * @author RollTwentyMock team, see AUTHORS
@@ -20,8 +21,7 @@ const RollTwentyMock = RollTwentyMock || function() {
         const gameObjectDB = [];
         const state = {};
 
-        // valid types for createObj() according to
-        // https://wiki.roll20.net/API:Objects#Creating_Objects
+        // valid types for createObj() are not the full list of types
         const createableObjectTypes = [
             'path',
             'text',
@@ -35,6 +35,7 @@ const RollTwentyMock = RollTwentyMock || function() {
             'handout'
         ];
 
+        // not sure these are needed
         const statusMarkers = [
             'red', 'blue', 'green', 'brown', 'purple', 'pink', 'yellow', 'dead', 'skull', 'sleepy', 'half-heart',
             'half-haze', 'interdiction', 'snail', 'lightning-helix', 'spanner', 'chained-heart', 'chemical-bolt',
@@ -45,6 +46,8 @@ const RollTwentyMock = RollTwentyMock || function() {
             'grenade', 'sentry-gun', 'all-for-one', 'angel-outfit', 'archery-target'
         ];
 
+        // giant dictionary of all the default fields/values for
+        // objects of each type
         const defaultValues = {
             path: {
                 _type: 'path',
@@ -284,17 +287,22 @@ const RollTwentyMock = RollTwentyMock || function() {
         var campaign;
 
         // classes
-        function _Roll20Event(trigger, cb) {
+        function APIEvent(trigger, cb) {
             this.trigger = trigger;
             this.cb = cb;
         }
-        _Roll20Event.prototype.run = function eventRun(details) {
+        APIEvent.prototype.run = function eventRun(details) {
             if (typeof this.cb === 'function') {
                 if (details === undefined) {
                     this.cb();
                 } else {
                     this.cb(details);
                 }
+            }
+        };
+        APIEvent.prototype.conditionalRun = function conditionalRun(trigger, details) {
+            if (this.trigger === trigger) {
+                this.run(details);
             }
         };
 
@@ -368,19 +376,16 @@ const RollTwentyMock = RollTwentyMock || function() {
             //     If the objects left property changed, then the order would be function3, then
             //     function1, then function2.
 
-            while (trigger.indexOf(':') != -1) {
-                eventList.forEach(function(e) {
-                    if (e.trigger == trigger) {
-                        e.run(details);
-                    }
+            while (trigger.indexOf(':') !== -1) {
+                eventList.forEach(function(entry) {
+                    entry.conditionalRun(trigger, details);
                 });
-
                 trigger = trigger.replace(/:[\w]+$/, '');
             }
         }
 
         function on(trigger, cb) {
-            var e = new _Roll20Event(trigger, cb);
+            var e = new APIEvent(trigger, cb);
             eventList.push(e);
         }
 
@@ -462,7 +467,7 @@ const RollTwentyMock = RollTwentyMock || function() {
         }
 
         function randomInteger(max) {
-            // This is inferior to Roll20's implementation but
+            // This is inferior to the real API's implementation but
             // no one should be using this for repeated calls.
             return Math.floor(Math.random() * max);
         }

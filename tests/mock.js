@@ -1,3 +1,6 @@
+/* jshint undef: true, unused: true, jasmine: true */
+/* globals describe, it, expect */
+
 'use strict';
 
 require('../src/RollTwentyMock');
@@ -47,7 +50,7 @@ describe('RollTwentyMock', function() {
             expect(state.bar[2]).toBe('horse');
             state.bar.push('ZZZZ');
             expect(state.bar[4]).toBe('ZZZZ');
-        })
+        });
     });
     describe('Campaign', function() {
         it('should return a campaign object', function() {
@@ -57,12 +60,12 @@ describe('RollTwentyMock', function() {
         });
 
     });
-    it('should export all the Roll20 API functions to GLOBAL', function() {
+    it('should export all the official API functions to GLOBAL', function() {
         for (var x = 0; x < expectedCount; x++) {
             var fn = expectedFunctions[x];
-            expect(GLOBAL[fn]).toBeDefined();
+            expect(global[fn]).toBeDefined();
 
-            var t = typeof GLOBAL[fn];
+            var t = typeof global[fn];
             expect(t).toBe('function');
         }
     });
