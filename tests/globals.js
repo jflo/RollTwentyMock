@@ -52,14 +52,6 @@ describe('RollTwentyMock', function() {
             expect(state.bar[4]).toBe('ZZZZ');
         });
     });
-    describe('Campaign', function() {
-        it('should return a campaign object', function() {
-            var c = Campaign();
-            expect(c._id).toBeDefined();
-            expect(c._type).toBe('campaign');
-        });
-
-    });
     it('should export all the official API functions to GLOBAL', function() {
         for (var x = 0; x < expectedCount; x++) {
             var fn = expectedFunctions[x];

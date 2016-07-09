@@ -174,7 +174,7 @@ const RollTwentyMock = RollTwentyMock || function() {
             },
             player: {
                 _type: 'player',
-                _d20userid: 123456,   // todo: generate this
+                _d20userid: '123456',   // todo: generate this
                 _displayname: 'Placeholder',
                 _online: false,
                 _macrobar: '',
@@ -286,11 +286,12 @@ const RollTwentyMock = RollTwentyMock || function() {
         var _initialized = false;
         var campaign;
 
-        // classes
+        // CLASS APIEVENT
         function APIEvent(trigger, cb) {
             this.trigger = trigger;
             this.cb = cb;
         }
+
         APIEvent.prototype.run = function eventRun(details) {
             if (typeof this.cb === 'function') {
                 if (details === undefined) {
@@ -300,12 +301,14 @@ const RollTwentyMock = RollTwentyMock || function() {
                 }
             }
         };
+
         APIEvent.prototype.conditionalRun = function conditionalRun(trigger, details) {
             if (this.trigger === trigger) {
                 this.run(details);
             }
         };
 
+        // CLASS GAMEOBJECT
         function GameObject(otype) {
             if (Object.keys(defaultValues).indexOf(otype) === -1) {
                 throw 'Tried to create unknown GameObject type';
@@ -417,6 +420,7 @@ const RollTwentyMock = RollTwentyMock || function() {
                 }
             }
         }
+
         function findObjs(attrs, options) {
             options = options || {};
 
@@ -434,24 +438,62 @@ const RollTwentyMock = RollTwentyMock || function() {
                 return true;
             });
         }
+
         function filterObjs(callback) {
             return gameObjectDB.filter(callback);
         }
+
         function getAllObjs() {
             return gameObjectDB;
         }
+
         function getAttrByName(character_id, attribute_name, value_type) {
             value_type = value_type || 'current';
-            
 
 
-        }
-        function toFront() {
 
         }
-        function toBack() {
 
+        function toFront(obj) {
+            if (!('_id' in obj)) throw 'Error: toFront() must be given an object either from an event or getObj() or similar.';
+            if (!('_pageid' in obj)) throw 'Error: Could not find page for object.';
+
+            var pg = getObj('page', obj._pageid);
+
+            if (!('_id' in pg)) throw 'Error: Could not find page for object.';
+
+            var zlist = pg._zorder.split(',');
+            var pos = zlist.indexOf(obj._id);
+            if (pos > -1) {
+                zlist.splice(pos, 1);
+            } else {
+                // todo: what's the real error? Is this even possible?
+                throw 'Error: obj not found in zorder list for that page';
+            }
+            zlist.unshift(obj._id);
+            pg._zorder = zlist.join();
         }
+
+        function toBack(obj) {
+            if (!('_id' in obj)) throw 'Error: toFront() must be given an object either from an event or getObj() or similar.';
+            if (!('_pageid' in obj)) throw 'Error: Could not find page for object.';
+
+            var pg = getObj('page', obj._pageid);
+
+            if (!('_id' in pg)) throw 'Error: Could not find page for object.';
+
+            var zlist = pg._zorder.split(',');
+            var pos = zlist.indexOf(obj._id);
+            if (pos > -1) {
+                zlist.splice(pos, 1);
+            } else {
+                // todo: what's the real error? Is this even possible?
+                throw 'Error: obj not found in zorder list for that page';
+            }
+            zlist.push(obj._id);
+            pg._zorder = zlist.join();
+        }
+
         function Campaign() {
             return campaign;
         }
@@ -491,7 +533,7 @@ const RollTwentyMock = RollTwentyMock || function() {
         function randomInteger(max) {
             // This is inferior to the real API's implementation but
             // no one should be using this for repeated calls.
-            return Math.floor(Math.random() * max);
+            return Math.floor(Math.random() * max) + 1;
         }
 
         function playerIsGM(playerID) {
